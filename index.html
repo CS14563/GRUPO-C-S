@@ -17,7 +17,7 @@
         - Operational Routines -> Guide a Process -> Interactive checklist/stepper (JS) -> Justification: Guides the user through daily tasks step-by-step.
         - Disciplinary Actions -> Clarify a Process -> HTML/CSS Flowchart -> Justification: Visualizes a sensitive workflow, making it easier to understand and follow correctly.
         - KPIs -> Inform/Compare -> Stat cards + Bar Chart (Chart.js) -> Justification: Makes abstract metrics tangible and shows performance visually.
-        - Customer Service, Marketing, Fiscal Standards -> Organize -> Accordion (JS) -> Justification: Manages large blocks of text, allowing users to focus on one topic at a time.
+        - Customer Service, Marketing, Fiscal, Defects/Returns, Accounts Receivable Standards -> Organize -> Accordion (JS) -> Justification: Manages large blocks of text, allowing users to focus on one topic at a time.
         - Contacts/Support Channels -> Inform -> Detailed List/Table (HTML) -> Justification: Provides a clear, centralized directory for quick reference.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -88,7 +88,7 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <img src="uploaded:Logo - PNG (2).png-ed74d783-4e3d-4fae-84a1-c2f777e06787" alt="Logo da Empresa" class="h-8 w-auto mr-3 flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x32/cccccc/ffffff?text=LOGO';">
+                        <img src="logo.png" alt="Logo da Empresa" class="h-8 w-auto mr-3 flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x32/cccccc/ffffff?text=LOGO';">
                         <h1 class="text-xl md:text-2xl font-bold text-gray-800">Manual Interativo de Liderança</h1>
                     </div>
                 </div>
@@ -111,6 +111,12 @@
                         </li>
                         <li class="mr-2">
                             <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="fiscal">Fiscal</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="defeitos">Defeitos / Devoluções</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="financeiro">Caixa / Financeiro</a>
                         </li>
                          <li class="mr-2">
                             <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="kpis">Processos & KPIs</a>
@@ -268,6 +274,22 @@
                 </div>
             </div>
 
+            <div id="defeitos" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Gestão de Devoluções e Defeitos</h2>
+                    <p class="text-gray-600 mb-6">Esta seção detalha o processo de tratativa de produtos com defeito, desde o conceito de defeito até o envio e acompanhamento junto aos fornecedores, garantindo o padrão de qualidade e a satisfação do cliente.</p>
+                    <div id="defeitos-accordion" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="financeiro" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Rotinas de Caixa e Contas a Receber</h2>
+                    <p class="text-gray-600 mb-6">Esta seção aborda os procedimentos essenciais para suprimentos, sangrias, conferência de caixa, resolução de problemas no sistema e regras de pagamento, garantindo a organização e a precisão financeira da loja.</p>
+                    <div id="financeiro-accordion" class="space-y-2"></div>
+                </div>
+            </div>
+
             <div id="conduta" class="content-section">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h2 class="text-2xl font-bold mb-2 text-blue-600">Regras de Conduta e Ética</h2>
@@ -366,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function () {
             content: `<ul class="list-disc list-inside space-y-2 text-gray-600">
                         <li>Compras a partir de R$ 400,00: Envio gratuito por PAC para o mesmo estado.</li>
                         <li>Compras a partir de R$ 800,00: Envio gratuito por PAC para qualquer lugar do país.</li>
-                        <li>Produtos enviados por Correios não podem ter desconto, apenas negociação na forma de pagamento.</li>
+                        <li>Produtos enviados por Correios: Descontos não aplicáveis; apenas a condição de pagamento pode ser negociada.</li>
                         <li>Troca por defeito: A empresa cobre o frete de envio (apresentar e-mail de autorização).</li>
                         <li>Troca simples: O cliente arca com o custo do frete.</li>
                     </ul>` 
@@ -423,6 +445,83 @@ document.addEventListener('DOMContentLoaded', function () {
                      </ol>
                      <h4 class="font-semibold text-gray-700 mt-3 mb-2">Erro Comum:</h4>
                      <p class="text-gray-600"><b>Nota não encontrada:</b> Verifique se o número da NF foi digitado corretamente. Se o erro persistir, contate o setor Fiscal.</p>`
+        }
+    ];
+
+    const defeitosData = [
+        {
+            title: 'Conceito e Tipos de Defeito',
+            content: `<p class="text-gray-600 mb-2">Um produto é considerado com defeito quando não cumpre sua função ou não oferece a segurança esperada. Os defeitos podem ser de fabricação ou provenientes de fatores externos.</p>`
+        },
+        {
+            title: 'Etapas do Processo de Devolução/Defeito',
+            content: `<ol class="list-decimal list-inside text-gray-600 space-y-1">
+                        <li>Recebimento do e-mail com informações do defeito.</li>
+                        <li>Envio do produto com defeito para a marca.</li>
+                        <li>Acompanhamento da análise junto ao fornecedor.</li>
+                        <li>Devolutiva para a loja ou cliente.</li>
+                        <li>Retorno do produto à marca.</li>
+                        <li>Reembolso ou solução cabível.</li>
+                    </ol>
+                    <p class="text-gray-600 mt-3"><b>Funções Envolvidas:</b> Abertura de processos, acompanhamento com fornecedores, emissão de NF de devolução, solicitação de reembolso.</p>`
+        },
+        {
+            title: 'Prazos, Conferência e Envios',
+            content: `<ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><b>Prazos:</b> Respeitar prazos da marca e do cliente.</li>
+                        <li><b>Conferência:</b> Verificar todas as informações antes do envio.</li>
+                        <li><b>Envios:</b> Processo só finaliza após envio ao fornecedor, mesmo com troca já realizada ao cliente.</li>
+                    </ul>`
+        },
+        {
+            title: 'Pontos de Atenção e Padrão de Fotos',
+            content: `<p class="text-gray-600 mb-2">Envie o processo no mesmo dia do recebimento do produto defeituoso, preenchendo o formulário padrão, verificando a data de compra e enviando todas as fotos conforme o padrão. Confira a validade do código de postagem dos Correios.</p>
+                     <h4 class="font-semibold text-gray-700 mt-2 mb-1">Padrão das Fotos:</h4>
+                     <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><b>Confecção (Roupas):</b> Frente, Costas, Etiqueta e Detalhe do defeito.</li>
+                        <li><b>Calçados:</b> Os dois pés juntos, Vista lateral, Vista superior (ângulo de cima), Solado e Detalhe do defeito.</li>
+                     </ul>`
+        },
+        {
+            title: 'Envio e Cuidados Importantes por Marca',
+            content: `<p class="text-gray-600 mb-2">Cada marca tem seu procedimento:</p>
+                     <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><b>Vans:</b> Portal ZZNET</li>
+                        <li><b>Oakley, Converse, OUS, Tesla:</b> E-mail</li>
+                     </ul>
+                     <p class="text-gray-600 mt-3"><b>Evitar envio de peças que NÃO são defeito de fábrica:</b> Manchadas de caneta, furadas por alarme, cortadas com tesoura.</p>`
+        }
+    ];
+
+    const financeiroData = [
+        {
+            title: 'Suprimentos e Sangrias',
+            content: `<ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li><b>Suprimentos:</b> Sempre confira sua planilha com o saldo em caixa e registre no sistema.</li>
+                        <li><b>Sangrias:</b> Nunca realize antes do suprimento. Em caso de erro, refaça o procedimento e comunique o grupo do caixa.</li>
+                        <li><b>Autorização:</b> Sangrias fora da rotina precisam de autorização prévia do escritório.</li>
+                        <li><b>Uber para Produtos:</b> Envie o print no grupo e marque o Hélio.</li>
+                    </ul>`
+        },
+        {
+            title: 'Conferência de Caixa',
+            content: `<ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li><b>Prazo:</b> Devolução em 2 a 3 dias.</li>
+                        <li><b>Leitura:</b> Leia e-mail e comunicado do grupo de caixa atentamente.</li>
+                        <li><b>Terminologia:</b> "Quebra" (venda sem pagamento); "Sobra" (pagamento sem venda).</li>
+                        <li><b>Correções:</b> Vendas lançadas em bandeira incorreta serão solicitadas para correção.</li>
+                    </ul>`
+        },
+        {
+            title: 'Problemas no Sistema',
+            content: `<p class="text-gray-600">Para qualquer problema no sistema, abra um chamado com o pessoal do Linx. Se não resolverem, envie uma mensagem detalhada com prints para agilizar a solução. Isso inclui vendas duplicadas, lançamentos incorretos ou trocas com bugs.</p>`
+        },
+        {
+            title: 'Regras do Caixa',
+            content: `<ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li><b>Pix com CNPJ:</b> Envie comprovante para o grupo do caixa (marcar Beatriz, Financeiro e Hélio) para liberação do produto.</li>
+                        <li><b>Compras de Funcionário (com desconto):</b> Devem ser registradas via link disponível na biografia do grupo de caixa.</li>
+                    </ul>`
         }
     ];
 
@@ -562,6 +661,8 @@ document.addEventListener('DOMContentLoaded', function () {
     renderAccordion(atendimentoData, 'accordion-atendimento');
     renderAccordion(marketingData, 'marketing-accordion');
     renderAccordion(fiscalData, 'fiscal-accordion');
+    renderAccordion(defeitosData, 'defeitos-accordion');
+    renderAccordion(financeiroData, 'financeiro-accordion');
 });
 </script>
 </body>
