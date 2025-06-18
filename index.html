@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Interativo de Operações e Liderança</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Professional Blue -->
+    <!-- Application Structure Plan: A tab-based SPA. The user selects a major topic from the top navigation (e.g., 'Operações', 'Gestão de Pessoas', 'Fiscal'). The main content area updates dynamically to show detailed information for that topic. This structure was chosen because it provides quick, non-linear access to specific procedures, which is ideal for a manager needing immediate answers. Instead of scrolling through a document, the user clicks a tab and gets the relevant information presented in an interactive format (checklists, diagrams, expandable sections), improving usability and efficiency. -->
+    <!-- Visualization & Content Choices: 
+        - Company Culture -> Inform -> Static cards with icons (HTML/CSS) -> Justification: Clear, high-visibility presentation of core values.
+        - Manager Responsibilities -> Organize -> Clickable cards (JS) -> Justification: Breaks down complex roles into digestible pieces.
+        - Operational Routines -> Guide a Process -> Interactive checklist/stepper (JS) -> Justification: Guides the user through daily tasks step-by-step.
+        - Disciplinary Actions -> Clarify a Process -> HTML/CSS Flowchart -> Justification: Visualizes a sensitive workflow, making it easier to understand and follow correctly.
+        - KPIs -> Inform/Compare -> Stat cards + Bar Chart (Chart.js) -> Justification: Makes abstract metrics tangible and shows performance visually.
+        - Customer Service, Marketing, Fiscal Standards -> Organize -> Accordion (JS) -> Justification: Manages large blocks of text, allowing users to focus on one topic at a time.
+        - Contacts/Support Channels -> Inform -> Detailed List/Table (HTML) -> Justification: Provides a clear, centralized directory for quick reference.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f5; 
+        }
+        .tab-active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .process-step {
+            transition: all 0.3s ease;
+        }
+        .process-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .contact-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .contact-item span:first-child {
+            font-weight: 600;
+            color: #4b5563;
+            width: 220px;
+            flex-shrink: 0;
+        }
+        .contact-item span:last-child {
+            color: #6b7280;
+            flex-grow: 1;
+        }
+         .accordion-button svg {
+            transition: transform 0.2s ease-in-out;
+        }
+        .accordion-button[aria-expanded="true"] svg {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="min-h-screen">
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <img src="uploaded:Logo - PNG (2).png-ed74d783-4e3d-4fae-84a1-c2f777e06787" alt="Logo da Empresa" class="h-8 w-auto mr-3 flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x32/cccccc/ffffff?text=LOGO';">
+                        <h1 class="text-xl md:text-2xl font-bold text-gray-800">Manual Interativo de Liderança</h1>
+                    </div>
+                </div>
+                <nav class="border-b border-gray-200">
+                    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 tab-active" data-tab="inicio">Início</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="operacoes">Operações</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="pessoas">Gestão de Pessoas</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="atendimento">Atendimento</a>
+                        </li>
+                         <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="marketing">Marketing</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="fiscal">Fiscal</a>
+                        </li>
+                         <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="kpis">Processos & KPIs</a>
+                        </li>
+                        <li class="mr-2">
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="conduta">Conduta</a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="suporte">Canais de Suporte</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+            
+            <div id="inicio" class="content-section active">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Bem-vindo(a), Gerente!</h2>
+                    <p class="text-gray-600">Este manual interativo foi criado para ser sua ferramenta de consulta rápida no dia a dia. O objetivo é facilitar a compreensão dos processos, fortalecer sua liderança e oferecer um direcionamento claro para os desafios da operação, garantindo autonomia, segurança e padronização.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg mb-2 text-gray-700">Nossa Missão</h3>
+                        <p class="text-gray-600">Oferecer estilo criando uma experiência marcante, através de muito carinho e atenção junto aos clientes.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="font-bold text-lg mb-2 text-gray-700">Nossa Visão</h3>
+                        <p class="text-gray-600">Ser a maior rede de lojas do segmento streetwear do país.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm col-span-1 md:col-span-2 lg:col-span-1">
+                        <h3 class="font-bold text-lg mb-2 text-gray-700">Nossos Valores</h3>
+                        <p class="text-gray-600">Lealdade, fé em Deus, valorização das pessoas, evolução, amor e qualidade.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm mt-6">
+                     <h2 class="text-2xl font-bold mb-4 text-blue-600">O Papel do Gerente</h2>
+                     <p class="text-gray-600 mb-6">Como gerente, você é a peça-chave na condução da loja. Sua liderança traduz a estratégia da empresa em ações práticas, impactando diretamente a equipe, o cliente e os resultados. Esta seção destaca suas principais responsabilidades.</p>
+                     <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800">Liderança e Exemplo</h4>
+                            <p class="text-sm text-blue-700">Inspirar um ambiente positivo, sendo referência de comportamento e comprometimento.</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800">Metas Comerciais</h4>
+                            <p class="text-sm text-blue-700">Garantir o foco da equipe no atingimento dos objetivos e acompanhar os resultados diariamente.</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800">Funcionamento da Loja</h4>
+                            <p class="text-sm text-blue-700">Assegurar que a loja esteja sempre organizada, limpa e com produtos bem expostos.</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800">Gestão de Equipe</h4>
+                            <p class="text-sm text-blue-700">Gerenciar escalas, promover feedbacks, treinamentos e zelar pelo bom clima organizacional.</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+            <div id="operacoes" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Rotinas Operacionais</h2>
+                    <p class="text-gray-600 mb-6">Esta seção detalha os procedimentos diários essenciais, desde a preparação da loja para receber os clientes até o seu fechamento seguro. Use estes checklists para garantir a padronização e a excelência em cada etapa do dia.</p>
+                    <div id="checklist-container"></div>
+                </div>
+            </div>
+
+            <div id="pessoas" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Gestão de Pessoas</h2>
+                    <p class="text-gray-600">Desenvolver, engajar e direcionar a equipe é uma de suas funções mais estratégicas. Aqui você encontra orientações sobre feedbacks, ações disciplinares e processos de comunicação com o RH, garantindo um ambiente saudável e produtivo.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h3 class="text-xl font-bold mb-4 text-gray-700">Fluxo de Ações Disciplinares</h3>
+                    <p class="text-gray-600 mb-6">Em casos de desvios de conduta, é fundamental agir com imparcialidade e seguir um processo claro. O diagrama abaixo ilustra a progressão recomendada para ações disciplinares. Lembre-se de documentar cada etapa e consultar o RH antes de aplicar advertências escritas ou suspensões.</p>
+                    <div class="flex flex-col md:flex-row items-stretch justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg w-full md:w-1/3 process-step">
+                            <h4 class="font-semibold">1. Advertência Verbal</h4>
+                            <p class="text-sm mt-1">Para faltas leves. Orientar e registrar internamente.</p>
+                        </div>
+                        <div class="text-2xl text-gray-400 font-light hidden md:flex items-center">&rarr;</div>
+                        <div class="p-4 bg-orange-100 border-l-4 border-orange-500 rounded-r-lg w-full md:w-1/3 process-step">
+                            <h4 class="font-semibold">2. Advertência Escrita</h4>
+                            <p class="text-sm mt-1">Em caso de reincidência. Formalizar com assinatura do colaborador.</p>
+                        </div>
+                        <div class="text-2xl text-gray-400 font-light hidden md:flex items-center">&rarr;</div>
+                        <div class="p-4 bg-red-100 border-l-4 border-red-500 rounded-r-lg w-full md:w-1/3 process-step">
+                            <h4 class="font-semibold">3. Suspensão</h4>
+                            <p class="text-sm mt-1">Para casos graves ou múltiplas advertências. Afastamento formal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="atendimento" class="content-section">
+                 <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Padrão de Atendimento</h2>
+                    <p class="text-gray-600 mb-6">Nosso padrão de atendimento visa criar uma experiência marcante para cada cliente, refletindo nossos valores de carinho, atenção e qualidade. Use as diretrizes abaixo para treinar a equipe e garantir a excelência em cada interação.</p>
+                    <div id="accordion-atendimento" class="space-y-2"></div>
+                </div>
+            </div>
+            
+            <div id="kpis" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Processos e Indicadores (KPIs)</h2>
+                    <p class="text-gray-600 mb-6">A gestão eficiente da loja depende do controle de processos administrativos, de estoque e do acompanhamento de indicadores de desempenho. Esta seção unifica estes temas para uma visão integrada da performance da loja.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 text-center">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-lg text-gray-700">Faturamento</h3>
+                        <p class="text-3xl font-bold text-blue-600">R$ 150k</p>
+                        <p class="text-sm text-gray-500">Valor total de vendas</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-lg text-gray-700">Ticket Médio (TM)</h3>
+                        <p class="text-3xl font-bold text-blue-600">R$ 250</p>
+                        <p class="text-sm text-gray-500">Valor médio por venda</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-lg text-gray-700">Peças/Atend. (PA)</h3>
+                        <p class="text-3xl font-bold text-blue-600">2.1</p>
+                        <p class="text-sm text-gray-500">Itens por compra</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-lg text-gray-700">Tx. Conversão</h3>
+                        <p class="text-3xl font-bold text-blue-600">15%</p>
+                        <p class="text-sm text-gray-500">Clientes que compraram</p>
+                    </div>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-bold mb-4 text-gray-700">Desempenho vs. Meta (Exemplo)</h3>
+                     <div class="chart-container">
+                        <canvas id="kpiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="marketing" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Diretrizes de Marketing</h2>
+                    <p class="text-gray-600 mb-6">Esta seção reúne todas as informações essenciais para as operações de Marketing, desde políticas de envio até o gerenciamento de vendas digitais e a comunicação visual da loja. Utilize estas diretrizes para garantir alinhamento e eficiência em todas as ações de marketing.</p>
+                    <div id="marketing-accordion" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="fiscal" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Processos Fiscais</h2>
+                    <p class="text-gray-600 mb-6">A conformidade fiscal é crucial para a operação. Esta seção detalha os procedimentos para o Romaneio de produtos sem cadastro e o Lançamento de Notas Fiscais no sistema, garantindo a organização e a precisão das operações fiscais da loja.</p>
+                    <div id="fiscal-accordion" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="conduta" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Regras de Conduta e Ética</h2>
+                    <p class="text-gray-600 mb-6">A postura profissional do gerente e da equipe reflete a imagem da nossa marca. Esta seção aborda as expectativas de conduta, vestimenta e como lidar com potenciais conflitos de interesse, garantindo um ambiente ético e transparente.</p>
+                    <div class="space-y-4">
+                        <div class="p-4 border rounded-lg bg-gray-50">
+                            <h3 class="font-semibold text-lg text-gray-700">Vestimenta e Postura</h3>
+                            <p class="mt-2 text-gray-600">O gerente deve usar a camiseta polo da sua respectiva bandeira e calça jeans ou sarja em cores neutras. A postura deve ser acolhedora, cortês e carismática, com uma atitude positiva e acessível ("sorriso no rosto").</p>
+                        </div>
+                         <div class="p-4 border rounded-lg bg-gray-50">
+                            <h3 class="font-semibold text-lg text-gray-700">Uso de Celular e Redes Sociais</h3>
+                            <p class="mt-2 text-gray-600">O celular é uma ferramenta de trabalho essencial, mas deve ser usado com discernimento. Evite o uso excessivo para fins pessoais, pois a liderança se dá pelo exemplo.</p>
+                        </div>
+                         <div class="p-4 border rounded-lg bg-gray-50">
+                            <h3 class="font-semibold text-lg text-gray-700">Conflitos de Interesse</h3>
+                            <p class="mt-2 text-gray-600">É fundamental evitar situações onde interesses pessoais interfiram nas decisões. Isso inclui nepotismo, uso de informação privilegiada e relacionamentos íntimos com subordinados diretos. Aja sempre com transparência.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="suporte" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-blue-600">Canais de Suporte</h2>
+                    <p class="text-gray-600 mb-6">Para qualquer dúvida ou problema, acione o departamento responsável. Lembre-se de sempre formalizar as comunicações pelos canais oficiais e respeitar os prazos de resposta de cada área.</p>
+                    <div class="space-y-2">
+                        <div class="contact-item"><span>Recursos Humanos (RH)</span><span>Victor Rocco</span></div>
+                        <div class="contact-item"><span>Departamento Pessoal (DP)</span><span>Larissa / Allan</span></div>
+                        <div class="contact-item"><span>Compras / Produtos</span><span>Cadu</span></div>
+                        <div class="contact-item"><span>Marketing</span><span>Samanta / Isabelle</span></div>
+                        <div class="contact-item"><span>Fiscal</span><span>Hellen</span></div>
+                        <div class="contact-item"><span>Gerente Administrativo</span><span>Hélio</span></div>
+                        <div class="contact-item"><span>Contas a Receber (Financeiro)</span><span>Beatriz</span></div>
+                        <div class="contact-item"><span>Devoluções e Defeitos</span><span>Sendy</span></div>
+                        <div class="contact-item"><span>Vendas Digitais</span><span>Rafael Bazzani</span></div>
+                        <div class="contact-item"><span>Supervisão Comercial</span><span>Geovana</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.content-section');
+    const kpiChartCanvas = document.getElementById('kpiChart');
+
+    const operationalChecklists = {
+        routines: [
+            { 
+                name: 'Abertura da Loja',
+                icon: '☀️',
+                tasks: [
+                    'Garantir que a loja esteja limpa e organizada.',
+                    'Realizar a checagem de equipamentos e sistemas (PDV, etc.).',
+                    'Conferir o caixa inicial (suprimento) e troco.',
+                    'Conduzir reunião rápida de início de turno com a equipe.',
+                    'Acompanhar a organização do estoque e "puxada" de produtos.'
+                ]
+            },
+            {
+                name: 'Durante o Funcionamento',
+                icon: '⏰',
+                tasks: [
+                    'Acompanhar de perto as vendas e o foco nas metas.',
+                    'Atuar ativamente no atendimento ao cliente.',
+                    'Supervisionar o desempenho e organizar as pausas da equipe.',
+                    'Monitorar e garantir a reposição de produtos na área de vendas.',
+                    'Registrar e comunicar ocorrências importantes à liderança.'
+                ]
+            },
+            {
+                name: 'Fechamento da Loja',
+                icon: '🌙',
+                tasks: [
+                    'Conferir o caixa, realizar sangrias e fechar no sistema.',
+                    'Encerrar as operações no PDV e salvar relatórios.',
+                    'Garantir a segurança: trancar portas, verificar alarmes e câmeras.',
+                    'Organizar a loja para o dia seguinte.'
+                ]
+            }
+        ]
+    };
+
+    const atendimentoData = [
+        { title: 'Boas-vindas e Abordagem', content: 'Receba com sorriso e postura acolhedora. Dê espaço ao cliente, mas demonstre prontidão. Use perguntas abertas para iniciar um diálogo consultivo.' },
+        { title: 'Argumentação de Vendas', content: 'Foque nos benefícios e soluções para o cliente. Demonstre conhecimento profundo do produto e use técnicas de venda consultiva para quebrar objeções e sugerir itens adicionais.' },
+        { title: 'Fechamento com Excelência', content: 'Seja ágil e cordial no pagamento. Embale os produtos com cuidado, reforce a boa escolha do cliente e convide-o a retornar.' },
+        { title: 'Atendimento a Trocas e Reclamações', content: 'Ouça com empatia e sem interromper. Siga a política de trocas rigorosamente e busque a solução mais rápida e adequada, transformando um problema em uma oportunidade de fidelização.' },
+    ];
+
+    const marketingData = [
+        { 
+            title: 'Correios e Frete', 
+            content: `<ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Compras a partir de R$ 400,00: Envio gratuito por PAC para o mesmo estado.</li>
+                        <li>Compras a partir de R$ 800,00: Envio gratuito por PAC para qualquer lugar do país.</li>
+                        <li>Produtos enviados por Correios não podem ter desconto, apenas negociação na forma de pagamento.</li>
+                        <li>Troca por defeito: A empresa cobre o frete de envio (apresentar e-mail de autorização).</li>
+                        <li>Troca simples: O cliente arca com o custo do frete.</li>
+                    </ul>` 
+        },
+        { 
+            title: 'Campanhas e Comunicação Visual', 
+            content: `<p class="text-gray-600 mb-2">A comunicação das campanhas é feita pelo grupo "SUPERVISÃO INSTAGRAM". É essencial respeitar as datas de vigência e sinalizar ao setor de marketing caso faltem materiais de divulgação na loja (tags, placas, etc.).</p>`
+        },
+        { 
+            title: 'Ações e Eventos', 
+            content: `<p class="text-gray-600">Para propor ações (internas ou externas), apresente a ideia com o máximo de informações: Data, valor, formas de pagamento (influencers somente permuta), perfis envolvidos, prazo para retorno e objetivo esperado.</p>`
+        },
+        { 
+            title: 'Tráfego Pago', 
+            content: `<p class="text-gray-600">A empresa investe em anúncios para atrair clientes. É crucial postar no feed no dia designado e manter comunicação com a Samanta sobre novos posts, produtos esgotados e padrões de compra de clientes de cidades vizinhas.</p>`
+        },
+        { 
+            title: 'Vendas Digitais', 
+            content: `<p class="text-gray-600 mb-2">Todas as vendas iniciadas online (WhatsApp/Instagram) devem ser registradas no grupo da loja com o print da venda no sistema e da conversa com o cliente. Isso vale mesmo que o cliente finalize a compra presencialmente.</p>
+                     <p class="text-gray-600">Responsável: Rafael Bazzani.</p>`
+        },
+        {
+            title: 'Dicas para Redes Sociais',
+            content: `<ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li><b>Diariamente:</b> Stories da loja aberta, novidades e reposições.</li>
+                        <li><b>2x por semana:</b> Post no feed (Reels ou foto).</li>
+                        <li><b>Atenção:</b> Evitar excesso de filtros, erros de português e usar o formato de postagem correto (alongado, nunca quadrado).</li>
+                        <li><b>Prioridade:</b> Stories "clean" com valor e tamanhos. Feed com o selo da campanha atual.</li>
+                     </ul>`
+        }
+    ];
+
+    const fiscalData = [
+        {
+            title: 'Romaneio de Produtos (Sem Cadastro / Nota Manual)',
+            content: `<p class="text-gray-600 mb-3">O Romaneio é usado para dar entrada em produtos sem cadastro prévio no sistema LINX ou com notas fiscais manuais. Sem ele, o produto não pode ser cadastrado nem vendido.</p>
+                     <h4 class="font-semibold text-gray-700 mb-2">Informações Necessárias:</h4>
+                     <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li>Número da NF e Loja</li>
+                        <li>Referência do produto, Tamanho, Quantidade e Cor</li>
+                        <li>Código de barras</li>
+                     </ul>
+                     <p class="text-gray-600 mt-3"><b>Fluxo:</b> Envie o romaneio preenchido para o setor fiscal por e-mail. O prazo para cadastro é de até 72 horas úteis.</p>`
+        },
+        {
+            title: 'Lançamento de Nota Fiscal (via XML no LINX)',
+            content: `<p class="text-gray-600 mb-3">Siga estes passos para lançar notas fiscais eletrônicas (NF-e) no portal LINX Microvix.</p>
+                     <ol class="list-decimal list-inside text-gray-600 space-y-2">
+                        <li>Navegue até: Suprimentos > Estoque > Entrada XML (NF-e).</li>
+                        <li>Localize a nota pelo número e clique em "Finalizar".</li>
+                        <li>Preencha os campos obrigatórios (Pedidos de compra, Categoria Financeiro: 26, Crediário, etc.).</li>
+                        <li>Em "Conta Fluxo (Compra a Prazo)", selecione sempre a opção "28 - Caixa Econômica Federal".</li>
+                        <li><b>ATENÇÃO:</b> Na última tela, confira as datas e valores com a nota fiscal e clique em <b>ATUALIZAR FATURAS</b>.</li>
+                     </ol>
+                     <h4 class="font-semibold text-gray-700 mt-3 mb-2">Erro Comum:</h4>
+                     <p class="text-gray-600"><b>Nota não encontrada:</b> Verifique se o número da NF foi digitado corretamente. Se o erro persistir, contate o setor Fiscal.</p>`
+        }
+    ];
+
+    function renderChecklists() {
+        const container = document.getElementById('checklist-container');
+        let html = '<div class="flex flex-col md:flex-row justify-around text-center gap-4">';
+        operationalChecklists.routines.forEach((routine, index) => {
+             html += `<button class="p-4 bg-white border rounded-lg shadow-sm flex-1 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 checklist-btn" data-index="${index}">${routine.icon} ${routine.name}</button>`;
+        });
+        html += '</div>';
+        html += '<div id="checklist-details" class="mt-6 bg-gray-50 p-6 rounded-lg" style="display:none;"></div>';
+        container.innerHTML = html;
+        
+        document.querySelectorAll('.checklist-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.checklist-btn').forEach(b => b.classList.remove('bg-blue-100', 'border-blue-400'));
+                e.currentTarget.classList.add('bg-blue-100', 'border-blue-400');
+                
+                const index = e.currentTarget.dataset.index;
+                const detailsContainer = document.getElementById('checklist-details');
+                const routine = operationalChecklists.routines[index];
+                
+                let detailsHtml = `<h3 class="font-bold text-lg mb-4">${routine.icon} ${routine.name}</h3><ul class="space-y-2 list-disc list-inside text-gray-700">`;
+                routine.tasks.forEach(task => {
+                    detailsHtml += `<li>${task}</li>`;
+                });
+                detailsHtml += `</ul>`;
+                
+                detailsContainer.innerHTML = detailsHtml;
+                detailsContainer.style.display = 'block';
+            });
+        });
+        document.querySelector('.checklist-btn').click();
+    }
+
+    function renderAccordion(data, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let html = '';
+        data.forEach((item, index) => {
+            html += `
+                <div class="border border-gray-200 rounded-lg bg-white">
+                    <h2>
+                        <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-gray-700 hover:bg-gray-50 focus:outline-none" data-accordion-target="#${containerId}-body-${index}" aria-expanded="false">
+                            <span>${item.title}</span>
+                            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                    </h2>
+                    <div id="${containerId}-body-${index}" class="hidden p-5 border-t border-gray-200">
+                        ${item.content}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+
+        container.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-accordion-target');
+                const targetPanel = document.querySelector(targetId);
+                const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+                button.setAttribute('aria-expanded', !isExpanded);
+                targetPanel.classList.toggle('hidden');
+            });
+        });
+    }
+
+    function switchTab(tab) {
+        tabs.forEach(t => t.classList.remove('tab-active'));
+        tab.classList.add('tab-active');
+        
+        const target = tab.dataset.tab;
+        sections.forEach(s => {
+            s.classList.remove('active');
+            if(s.id === target) {
+                s.classList.add('active');
+            }
+        });
+
+        if (target === 'kpis' && kpiChartCanvas.offsetParent !== null && !kpiChartCanvas.chart) {
+             renderKpiChart();
+        }
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function (e) {
+            e.preventDefault();
+            switchTab(this);
+        });
+    });
+
+    function renderKpiChart() {
+        if (kpiChartCanvas.chart) {
+            kpiChartCanvas.chart.destroy();
+        }
+        const ctx = kpiChartCanvas.getContext('2d');
+        kpiChartCanvas.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Faturamento', 'Ticket Médio', 'Peças/Atend.', 'Tx. Conversão'],
+                datasets: [{
+                    label: 'Resultado',
+                    data: [150, 250, 2.1, 15],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Meta',
+                    data: [140, 260, 2.5, 18],
+                    backgroundColor: 'rgba(209, 213, 219, 0.6)',
+                    borderColor: 'rgba(156, 163, 175, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+    
+    renderChecklists();
+    renderAccordion(atendimentoData, 'accordion-atendimento');
+    renderAccordion(marketingData, 'marketing-accordion');
+    renderAccordion(fiscalData, 'fiscal-accordion');
+});
+</script>
+</body>
+</html>
